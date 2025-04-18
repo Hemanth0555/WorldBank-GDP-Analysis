@@ -1,0 +1,87 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv(r"C:\Users\Heman\Downloads\WorldBank.csv")
+
+# Show column names
+print("Columns in the dataset:")
+print(df.columns)
+
+# Info
+print("\nDataset Info:")
+print(df.info())
+
+# Describe the dataset
+print("\nStatistical Summary of the Dataset:")
+print(df.describe())
+
+# Set seaborn style
+sns.set(style="whitegrid")
+
+# 1. Line Plot: GDP trend over time for a specific country
+country = "India"
+gdp_trend = df[df["Country Name"] == country].sort_values("Year")
+
+plt.figure(figsize=(10, 6))
+sns.lineplot(x="Year", y="GDP (USD)", data=gdp_trend, marker="o", color="blue")
+plt.title(f"GDP Trend Over Time: {country}")
+plt.xlabel("Year")
+plt.ylabel("GDP (USD)")
+plt.tight_layout()
+plt.show()
+
+# 2. Bar Plot: Top 10 countries by GDP in a specific year
+year = 2018
+top10 = df[df["Year"] == year].sort_values("GDP (USD)", ascending=False).head(10)
+
+plt.figure(figsize=(12, 6))
+sns.barplot(x="Country Name", y="GDP (USD)", data=top10, hue="Country Name", palette="viridis", legend=False)
+plt.title(f"Top 10 Countries by GDP in {year}")
+plt.xlabel("Country")
+plt.ylabel("GDP (USD)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# 3. Histogram Plot: Distribution of GDP
+plt.figure(figsize=(10, 6))
+sns.histplot(df["GDP (USD)"].dropna(), bins=50, kde=True, color="skyblue")
+plt.title("Distribution of GDP")
+plt.xlabel("GDP (USD)")
+plt.ylabel("Frequency")
+plt.tight_layout()
+plt.show()
+
+# 4. Scatter Plot: GDP vs. Population Density
+plt.figure(figsize=(10, 6))
+subset = df.dropna(subset=["GDP (USD)", "Population density (people per sq. km of land area)", "Region"])
+sns.scatterplot(
+    x="Population density (people per sq. km of land area)",
+    y="GDP (USD)",
+    hue="Region",
+    data=subset,
+    alpha=0.7
+)
+plt.title("GDP vs. Population Density")
+plt.xlabel("Population Density (people/sq. km)")
+plt.ylabel("GDP (USD)")
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.tight_layout()
+plt.show()
+
+# 5. Heatmap: Correlation matrix of selected numeric columns
+numeric_columns = df.select_dtypes(include=[np.number]).columns
+selected = ["GDP (USD)", "Population", "Population density (people per sq. km of land area)"]
+selected = [col for col in selected if col in numeric_columns]
+
+corr = df[selected].corr()
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+plt.title("Correlation Heatmap")
+plt.tight_layout()
+plt.show()
+
